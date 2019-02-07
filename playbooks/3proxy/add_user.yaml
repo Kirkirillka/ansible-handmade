@@ -1,0 +1,22 @@
+---
+  - hosts: proxy
+    remote_user: vagrant
+    become: yes
+    vars_files:
+      - vars/3proxy_conf.yaml
+      - vars/new_users.yaml
+    tasks:
+      - name: Delete a user info if it's already been added
+        lineinfile:
+          path: "{{ proxy_conf_dir }}/passwd"
+          state: absent
+          regexp: "^{{new_user_name}}:"
+      - name: Generate a new user data for proxy
+        shell: "echo {{new_user_name}}:`{{ proxy_exec_dir }}/bin/mycrypt '{{new_user_salt}}' {{new_user_password}}` >> {{ proxy_conf_dir }}/passwd"
+        notify:
+          - restart 3proxy
+    handlers:
+      - name: restart 3proxy
+        service:
+          name: 3proxy
+          state: restarted
