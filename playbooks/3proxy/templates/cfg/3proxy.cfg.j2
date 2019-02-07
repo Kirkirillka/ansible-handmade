@@ -1,0 +1,27 @@
+timeouts 1 5 30 60 180 1800 15 60
+
+log @ident
+logformat "L%C - %U [%d/%o/%Y:%H:%M:%S %z] ""%T"" %E %I %O %N/%R:%r"
+
+
+nserver 31.13.130.172
+nserver 31.13.130.173
+nserver 8.8.8.8
+nserver 8.8.4.4
+
+#Compress logs using gzip
+#
+archiver gz /usr/bin/gzip %F
+#store the logs for 30 days
+rotate 1
+
+users $"{{ proxy_conf_dir }}/passwd"
+
+auth strong
+proxy -p{{http_https_port}}
+socks -p{{socks5_port}}
+ftppr -p{{ftp_port}}
+pop3p -p{{pop3_port}}
+
+
+admin -p3200
