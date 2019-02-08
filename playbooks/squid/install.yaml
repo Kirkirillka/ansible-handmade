@@ -1,0 +1,42 @@
+---
+- name: Install Squid proxy server
+  hosts: proxy
+  vars:
+    squid_conf_path: /etc/squid/squid.conf
+    allow_network: 0.0.0.0/0
+  tasks:
+    - name: Install Squid from default repo
+      yum:
+        name: squid
+        state: latest
+    # https://possiblelossofprecision.net/?p=1908
+    - name: Backup current squid configuration
+      copy:
+        remote_src: yes
+        src: '{{squid_conf_path}}'
+        dest: '{{squid_conf_path}}.back'
+    - name: Upload Squid configuration
+      template:
+        src: cfg/squid.conf.j2
+        dest: "{{squid_conf_path}}"
+    - name: Create PAM conf for pam library
+      file:
+        path: /etc/pam.d/squid
+        state: touch
+    - name: Insert pam for squid pam configuration
+      lineinfile:
+        path: /etc/pam.d/squid
+        line: '{{item}}'
+      with_items:
+        - "#%PAM-1.0"
+        - "auth            include         password-auth"
+        - "account         required        pam_permit.so"
+        - "account         include         password-auth"
+    - name: Set permission for pam library
+      file:
+        path: "/usr/lib64/squid/basic_pam_auth"
+        mode: u+s
+    - name: Restart Squid service
+      service:
+        name: squid
+        state: restarted
