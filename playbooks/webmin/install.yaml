@@ -1,0 +1,27 @@
+
+---
+- name: Install webmin
+  hosts: proxy
+  tasks:
+    - name: Install dependencies for Webmin
+      yum:
+        name: ['perl', 'perl-Net-SSLeay', 'openssl', 'perl-IO-Tty', 'perl-Encode-Detect']
+        state: latest
+    - name: Download Webmin RPM package
+      get_url:
+        url: http://prdownloads.sourceforge.net/webadmin/webmin-1.900-1.noarch.rpm
+        dest: /tmp
+    - name: Install Webmin RPM
+      yum:
+        name: /tmp/webmin-1.900-1.noarch.rpm
+        state: present
+    - name: Delete downloaded RPM package
+      file:
+        path: /tmp/webmin-1.900-1.noarch.rpm
+        state: absent
+    - name: Start Webmin
+      shell: service webmin start
+      become: yes
+    - name: Update Webmin autostart
+      shell: systemctl enable webmin
+      become: yes
