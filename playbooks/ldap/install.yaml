@@ -1,0 +1,33 @@
+---
+  - hosts: domains
+    become: yes
+    vars:
+      allow_network: 0.0.0.0/0
+    tasks:
+      - name: Ensure Epel repo is installed
+        yum:
+          name: epel-release
+          state: latest
+      - name: Install dependencies
+        yum:
+          name: ['openldap','compat-openldap', 'openldap-clients' ,'openldap-servers', 'openldap-servers-sql', 'openldap-devel']
+          state: latest
+      - name: Start LDAP server
+        service:
+          name: slapd
+          state: started
+      - name: Enable autostart of LDAP server
+        shell: systemctl enable slapd
+
+      - name: Install Apache and phpldapadmin
+        yum:
+          name: ['httpd','phpldapadmin']
+          state: latest
+      - name: Install PHP
+        yum:
+          name: ['php', 'php-mbstring', 'php-pear' ]
+          state: installed
+      - name: Modify configuration
+        template:
+          src: 'cfg/phpldapadmin.conf.j2'
+          dest: '/etc/httpd/conf.d/phpldapadmin.conf'
