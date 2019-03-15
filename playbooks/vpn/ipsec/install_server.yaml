@@ -1,0 +1,36 @@
+---
+- hosts: vpn
+  become: yes
+  vars_files:
+    - cfg/ipsec.yaml
+  tasks:
+    - name: Install  necessary packages (for IKE strongswan is used)
+      yum:
+        name: [strongswan, haveged, ipsec-tools]
+        state: latest
+    - name: Start services
+      service:
+        name: haveged
+        state: started
+        enabled: yes
+    - name: Prepare the script for CA initialization
+      template:
+        src: templates/configuration/exec_ca.sh.j2
+        dest: /etc/strongswan/exec_ca.sh
+    - name: Run the CA script
+      command: sh /etc/strongswan/exec_ca.sh
+    - name: Apply configuration on IPSec module
+      template:
+        src: templates/configuration/ipsec.conf.j2
+        dest: /etc/strongswan/ipsec.conf
+    - name: Apply authentication secrets on IPSec module
+      template:
+        src: templates/configuration/ipsec.secret.j2
+        dest: /etc/strongswan/ipsec.secrets
+    - name: Restart IPSec IKEv2 strongswan service
+      command: strongswan restart
+    - name: Fetch .p12 archive with data for client's connection
+      fetch:
+        src: '{{IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH}}'
+        dest: ./
+        flat: yes

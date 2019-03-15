@@ -1,0 +1,82 @@
+# Even if I know that the best way to configure strongSwan is to use vici and swanctl utilities,
+# I believe that native configuration through  low-level ipsec.conf is better approach for us.
+
+
+# /etc/ipsec.conf - strongSwan IPsec configuration file
+
+config setup
+        # Restrict more than one connection per a user
+        #uniqueids=yes
+        charondebug="cfg 2, dmn 2, ike 2, net 2"
+
+conn %default
+        ikelifetime=60m
+        keylife=20m
+        rekeymargin=3m
+        keyingtries=1
+        keyexchange=ikev2
+
+        # Proposal algorithms. The chosen ones are quite strong, compatible with Windows 10.
+        ike=aes128-sha256-ecp256,aes256-sha384-ecp384,aes128-sha256-modp2048,aes128-sha1-modp2048,aes256-sha384-modp4096,aes256-sha256-modp4096,aes256-sha1-modp4096,aes128-sha256-modp1536,aes128-sha1-modp1536,aes256-sha384-modp2048,aes256-sha256-modp2048,aes256-sha1-modp2048,aes128-sha256-modp1024,aes128-sha1-modp1024,aes256-sha384-modp1536,aes256-sha256-modp1536,aes256-sha1-modp1536,aes256-sha384-modp1024,aes256-sha256-modp1024,aes256-sha1-modp1024!
+        esp=aes128gcm16-ecp256,aes256gcm16-ecp384,aes128-sha256-ecp256,aes256-sha384-ecp384,aes128-sha256-modp2048,aes128-sha1-modp2048,aes256-sha384-modp4096,aes256-sha256-modp4096,aes256-sha1-modp4096,aes128-sha256-modp1536,aes128-sha1-modp1536,aes256-sha384-modp2048,aes256-sha256-modp2048,aes256-sha1-modp2048,aes128-sha256-modp1024,aes128-sha1-modp1024,aes256-sha384-modp1536,aes256-sha256-modp1536,aes256-sha1-modp1536,aes256-sha384-modp1024,aes256-sha256-modp1024,aes256-sha1-modp1024,aes128gcm16,aes256gcm16,aes128-sha256,aes128-sha1,aes256-sha384,aes256-sha256,aes256-sha1!
+
+        # Use private certificate to authenticate server
+        leftcert={{IPSEC_SERVER_CERT_PATH}}
+
+        # Tell the peer that these subnet is lying behind the VPN server
+        #leftsubnet=192.168.44.0/24
+        #rightsubnet=0.0.0.0/0
+
+
+        # Allow firewall rules
+        #leftfirewall=yes
+        #rightfirewall=yes
+
+
+        # Peer can be anyone
+        right=%any
+        # Tell to choose a virtual IP from this IP range
+        rightsourceip={{IPSEC_VIRTUAL_IP}}
+
+        auto=start
+
+
+# Allow connection using just certificates
+conn IPSec-IKEv2
+        keyexchange=ikev2
+        eap_identity=%identity
+        rightsendcert=always
+
+# Allow connection via IKEv2-EAP-RADIUS
+conn IPSec-IKEv2-EAP
+        also="IPSec-IKEv2"
+        rightauth={{IPSEC_PEER_AUTH_MODE}}
+        eap_identity=%identity
+        rightsendcert=always
+
+
+# Allow connection via IKEv2-EAP-RADIUS
+#conn IPSec-IKEv2-EAP-RADIUS
+#        rightauth={{IPSEC_PEER_AUTH_MODE}}
+#        also="IPSec-IKEv2"
+#        eap_identity=%identity
+#        rightsendcert=always
+
+
+# Allow connection using certificates and username/password MSCHAPv2
+#conn IPSec-IKEv2-EAP-MSCHAPv2
+#        #also="IPSec-IKEv2"
+#        rightauth=eap-mschapv2
+#        leftfirewall=yes
+#        rightsendcert=always
+
+
+
+
+# Allow connection using certificates and manual EAP-TLS
+# WARNING! Not working!
+#conn IPSec-IKEv2-EAP-TLS
+#        also="IPSec-IKEv2"
+#        leftauth=eap
+#        rightauth=eap-tls
+#        eap_identity=%identity
