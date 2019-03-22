@@ -37,4 +37,4 @@ Your IPSec serve will store CA , so you would be able to utilize PKI infrastruct
 
 
 ## Troubleshooting
-Of course, in any difficult system, there are errors. In this section you may find information about [a IPSec installation and configuration] (info) in different OS's.
+Of course, in any difficult system, there are errors. In this section you may find information about [a type_here] (info) IPSecinstallation and configuration  in different OS's.
