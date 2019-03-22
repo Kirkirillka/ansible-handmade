@@ -1,0 +1,9 @@
+- hosts: ipsec
+  tasks:
+    - name: Include Variables
+      include_vars:
+        dir: ../config
+        extensions:
+          - yaml
+    - name: Initialize CA
+      import_tasks: ../tasks/server_tasks.yaml

@@ -1,0 +1,6 @@
+CA_KEY_NAME: cakey.pem
+CA_CERT_NAME: cacert.pem
+
+CA_FQDN: strongswan.org
+
+CA_DN: "C=RU, O=IT-Park Technical Dept Root CA, CN={{CA_FQDN}}"
