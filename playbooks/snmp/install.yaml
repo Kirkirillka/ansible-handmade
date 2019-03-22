@@ -1,0 +1,21 @@
+---
+  - hosts: snmp
+    vars:
+      community: snmp
+      user: monitoring
+      subtree: .iso
+      allowed_zone: trusted
+    tasks:
+      - name: CentOS | Install snmpd
+        include_tasks: specific/centos_snmpd.yaml
+        when:
+          - ansible_facts['distribution'] == "CentOS"
+    handlers:
+      - name: restart snmpd
+        service:
+          name: snmpd
+          state: restarted
+      - name: reload firewalld
+        service:
+          name: firewalld
+          state: reloaded

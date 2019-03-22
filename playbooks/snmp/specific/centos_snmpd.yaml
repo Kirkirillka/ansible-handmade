@@ -1,0 +1,28 @@
+- name: CentOS | Ensure snmpd  and snmpd-tools is installed
+  # SNMP V2, so no encryption is avaiable
+  yum:
+    name: ["net-snmp", "net-snmp-utils"]
+    state: latest
+- name:  CentOS | Backup the current configuration
+  copy:
+    src: /etc/snmp/snmpd.conf
+    dest: '/tmp/snmpd.conf.back{{ansible_date_time["epoch"]}}'
+    remote_src: yes
+- name:  CentOS | Configure snmpd
+  template:
+    src: cfg/snmpd.conf.j2
+    dest: /etc/snmp/snmpd.conf
+- name: CentOS | Push to start FirewallD
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+- name: CentOS | Allow connection through firewall
+  firewalld:
+    service: snmp
+    permanent: yes
+    state: enabled
+    zone: "{{allowed_zone}}"
+  notify:
+    - restart snmpd
+    - reload firewalld
