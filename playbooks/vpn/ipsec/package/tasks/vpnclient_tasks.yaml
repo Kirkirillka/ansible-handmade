@@ -6,6 +6,14 @@
   yum:
     name: strongswan
     state: latest
+- name: Disable SELinux in configuration file
+  replace:
+    path: /etc/selinux/config
+    regexp: SELINUX=\w*
+    replace: SELINUX=disabled
+- name: Disable SELinux temporarily
+  shell: setenforce 0
+  ignore_errors: yes
 - name: Start services
   service:
     name: strongswan
