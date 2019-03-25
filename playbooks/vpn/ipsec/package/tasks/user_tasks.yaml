@@ -1,4 +1,4 @@
-- name:  Generate Private RSA key for  "{{user}}"
+- name:  Generate Private RSA key for "{{user}}"
   shell: /sbin/strongswan pki --gen --type rsa --size 4096 --outform pem > {{IPSEC_PRIV_KEY_PATH}}/{{user}}_key.pem
 
 
@@ -22,11 +22,11 @@
     - "{{IPSEC_PKCS12_PATH}}/{{user}}_bundle.p12"
   loop_control:
         loop_var: credpath
-- name: Apply strongswan configuration (swanctl used) for {{user}}
+- name: Apply strongswan configuration (swanctl used) for "{{user}}"
   template:
     src: ../templates/vpn.conf.j2
     dest: "{{ IPSEC_CONF_PATH }}/vpn.conf"
-- name: Run swanctl to apply configuration for {{user}}
+- name: Run swanctl to apply configuration for "{{user}}"
   service:
     name: strongswan-swanctl
     state: restarted
