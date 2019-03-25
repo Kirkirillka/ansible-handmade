@@ -1,9 +1,4 @@
 - hosts: clients
-  vars:
-    - user_mapping: {
-      client: "admin",
-      client2: "k.kukarcev"
-    }
   tasks:
     - name: Include Variables
       include_vars:
@@ -11,4 +6,4 @@
         extensions:
           - yaml
     - name: Apply IPSec configuration
-      include: ../tasks/vpnclient_tasks.yaml  user={{user_mapping[inventory_hostname]}}
+      include: ../tasks/vpnclient_tasks.yaml  user={{IPSEC_USER_MAPPING[inventory_hostname]}}
