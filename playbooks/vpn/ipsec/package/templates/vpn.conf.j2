@@ -16,7 +16,7 @@ connections {
       }
       children {
          vpn {
-            local_ts = 10.3.0.0/24
+            local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
 
 
             updown = /usr/libexec/strongswan/_updown iptables
@@ -34,6 +34,6 @@ connections {
 
 pools {
         rw_pool  {
-                addrs = 10.3.0.0/24
+                addrs = {{IPSEC_ENCRYPTION_DOMAIN}}
         }
 }

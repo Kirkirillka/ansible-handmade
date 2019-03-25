@@ -15,7 +15,7 @@ connections {
       }
       children {
          vpn {
-            remote_ts = 10.3.0.0/24
+            remote_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
 
             updown = /usr/libexec/strongswan/_updown iptables
             rekey_time = 5400
