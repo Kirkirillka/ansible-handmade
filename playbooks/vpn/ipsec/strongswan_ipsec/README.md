@@ -33,7 +33,7 @@ You should install the package on your OS. .p12 is easy to install on Windows an
 
 Your IPSec serve will store CA , so you would be able to utilize PKI infrastructure to create extra users, but make sure you understand what are you doing.
 
-**WARNING! DON'T REALLY STORE CA ALONG WITH IPSEC. IF IPSEC SERVER IS COMPROMISED, THE WHOLE SECURITY IS AT RISK. **
+**WARNING! DON'T REALLY STORE CA ALONG WITH IPSEC. IF IPSEC SERVER IS COMPROMISED, THE WHOLE SECURITY IS AT RISK.**
 
 
 ## Troubleshooting
