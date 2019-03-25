@@ -1,0 +1,41 @@
+---
+  - hosts: webservers
+    become: yes
+    vars:
+      http_port: 80
+      max_clients: 200
+    remote_user: vagrant
+    tasks:
+      - name: Ensure nginx at the latest version
+        yum:
+          name: nginx
+          state: latest
+      - name: Write the nginx config file
+        template:
+          src: test_config.j2
+          dest: /etc/nginx.conf
+        notify:
+        - restart nginx
+      - name: Ensure nginx is running
+        service:
+          name: nginx
+          state: started
+    handlers:
+      - name: restart nginx
+        service:
+          name: nginx
+          state: restarted
+
+  - hosts: databases
+    remote_user: vagrant
+    become: yes
+
+    tasks:
+      - name: Ensure PostgreSQL is at the latest version
+        yum:
+          name: postgresql
+          state: latest
+      - name: Ensure that postgresql is started
+        service:
+          name: postgresql
+          state: started

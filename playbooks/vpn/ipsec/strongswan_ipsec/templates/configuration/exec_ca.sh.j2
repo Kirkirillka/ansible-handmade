@@ -19,7 +19,7 @@ strongswan pki --gen --type rsa --size 4096 --outform pem > {{IPSEC_CA_PRIV_KEY_
 chmod 600 {{IPSEC_CA_PRIV_KEY_PATH}}
 
 # Generate Self-Signed Certificate for CA
-strongswan pki --self --ca --lifetime 3650 --in {{IPSEC_CA_PRIV_KEY_PATH}} --type rsa --dn "C=RU, O=IT-Park Technical Dept Root CA, CN=example.org" --outform pem > {{IPSEC_CA_CERT_PATH}}
+strongswan pki --self --ca --lifetime 3650 --in {{IPSEC_CA_PRIV_KEY_PATH}} --type rsa --dn "C=RU, O=IT-Park Technical Dept Root CA, CN={{IPSEC_CA_DOMAIN_NAME}}" --outform pem > {{IPSEC_CA_CERT_PATH}}
 
 # Show generated certificate
 strongswan  pki --print --in {{IPSEC_CA_CERT_PATH}}
@@ -34,7 +34,7 @@ chmod 600 {{IPSEC_SERVER_PRIV_KEY_PATH}}
 # WARNING! You must put either your valid IP address or DNS name. Make sure you're already have a domain name which resolves in you VPN server or set
 # local names in /etc/hosts or DNS server
 
-strongswan pki --pub --in {{IPSEC_SERVER_PRIV_KEY_PATH}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CA_CERT_PATH}} --cakey {{IPSEC_CA_PRIV_KEY_PATH}} --dn "C=RU, O=IT-Park, CN=vpn.example.org" --san vpn.example.org --san vpn.example.com --san vpn.example.net --san 192.168.250.107  --san @192.168.250.107 --flag serverAuth --flag ikeIntermediate --outform pem >{{IPSEC_SERVER_CERT_PATH}}
+strongswan pki --pub --in {{IPSEC_SERVER_PRIV_KEY_PATH}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CA_CERT_PATH}} --cakey {{IPSEC_CA_PRIV_KEY_PATH}} --dn "C=RU, O=IT-Park, CN={{IPSEC_SERVER_ID}}.{{IPSEC_CA_DOMAIN_NAME}}" --san {{IPSEC_SERVER_ID}}.{{IPSEC_CA_DOMAIN_NAME}} --flag serverAuth --flag ikeIntermediate --outform pem >{{IPSEC_SERVER_CERT_PATH}}
 
 # Show generated certificate
 strongswan pki --print --in {{IPSEC_SERVER_CERT_PATH}}
@@ -48,15 +48,11 @@ chmod 600 {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}}
 
 # Generate and sign an user certificate with our CA private key and certificate. As both user's and server part was issued by the same CA, they can trust each other.
 # CName should contain the same FQDN of the server, especially for Windows' client.
-strongswan pki --pub --in {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CA_CERT_PATH}} --cakey {{IPSEC_CA_PRIV_KEY_PATH}} --dn "C=RU, O=IT Park Clients, CN=john@example.org" --san "john@example.org" --san "john@example.net" --outform pem > {{IPSEC_INIT_CLIENT_CERT_PATH}}
+strongswan pki --pub --in {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CA_CERT_PATH}} --cakey {{IPSEC_CA_PRIV_KEY_PATH}} --dn "C=RU, O=IT Park Clients, CN={{IPSEC_CLIENT_ID}}.{{IPSEC_CA_DOMAIN_NAME}}" --san "{{IPSEC_CLIENT_ID}}.{{IPSEC_CA_DOMAIN_NAME}}" --outform pem > {{IPSEC_INIT_CLIENT_CERT_PATH}}
 
-# Then a little piece of magic to create a .p12 archive. It will contain both CA certificate, issued client certificate + user private key
-#openssl rsa -inform DER -in {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} -out ipsec.d/private/JohnKey.pem -outform PEM
-#openssl x509 -inform DER -in {{IPSEC_INIT_CLIENT_CERT_PATH}} -out ipsec.d/certs/JohnCert.pem -outform PEM
-#openssl x509 -inform DER -in {{IPSEC_CA_CERT_PATH}} -out ipsec.d/cacerts/ca_cert.pem -outform PEM
 
 # Create a .p12 archive
 # WARNING! The .p12 archive will be created without any password
-openssl pkcs12 -export  -inkey {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} -in {{IPSEC_INIT_CLIENT_CERT_PATH}} -name "John's VPN Certificate"  -certfile {{IPSEC_CA_CERT_PATH}} -caname "IT Park Root CA" -out {{IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH}} -passout pass:
+openssl pkcs12 -export  -inkey {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} -in {{IPSEC_INIT_CLIENT_CERT_PATH}} -name "{{IPSEC_CLIENT_ID}}'s VPN Certificate"  -certfile {{IPSEC_CA_CERT_PATH}} -caname "IT Park Root CA" -out {{IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH}} -passout pass:
 
 # Then the generated .p12 archive can be deployed on any client and used to instantiate the IPSec VPN connection

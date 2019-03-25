@@ -1,0 +1,13 @@
+strongswan pki --gen --type rsa --size 2048 --outform pem > {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}}
+chmod 600 {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}}
+
+# Generate and sign an user certificate with our CA private key and certificate. As both user's and server part was issued by the same CA, they can trust each other.
+# CName should contain the same FQDN of the server, especially for Windows' client.
+strongswan pki --pub --in {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CA_CERT_PATH}} --cakey {{IPSEC_CA_PRIV_KEY_PATH}} --dn "C=RU, O=IT Park Clients, CN={{USERNAME}}@example.org" --san "{{USERNAME}}@example.org" --san "{{USERNAME}}@example.net" --outform pem > {{IPSEC_INIT_CLIENT_CERT_PATH}}
+
+
+# Create a .p12 archive
+# WARNING! The .p12 archive will be created without any password
+openssl pkcs12 -export  -inkey {{IPSEC_INIT_CLIENT_PRIV_KEY_PATH}} -in {{IPSEC_INIT_CLIENT_CERT_PATH}} -name "{{USERNAME}}'s VPN Certificate"  -certfile {{IPSEC_CA_CERT_PATH}} -caname "IT Park Root CA" -out {{IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH}} -passout pass:
+
+# Then the generated .p12 archive can be deployed on any client and used to instantiate the IPSec VPN connection

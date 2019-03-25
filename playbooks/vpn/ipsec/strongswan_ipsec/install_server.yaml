@@ -1,9 +1,13 @@
 ---
-- hosts: vpn
+- hosts: client
   become: yes
   vars_files:
     - cfg/ipsec.yaml
   tasks:
+    - name: Check if extra repos are installed
+      yum:
+        name: epel-release
+        state: latest
     - name: Install  necessary packages (for IKE strongswan is used)
       yum:
         name: [strongswan, haveged, ipsec-tools]

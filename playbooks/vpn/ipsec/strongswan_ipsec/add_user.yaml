@@ -1,0 +1,14 @@
+---
+  - hosts: client
+    vars:
+      - USERNAME: client_1
+      - IPSEC_CA_CERT_PATH: /etc/strongswan/ipsec.d/cacerts/ca_cert.pem
+      - IPSEC_CA_PRIV_KEY_PATH: /etc/strongswan/ipsec.d/private/private_ca.pem
+      - IPSEC_INIT_CLIENT_PRIV_KEY_PATH:  /etc/strongswan/ipsec.d/private/{{USERNAME}}Key.pem
+      - IPSEC_INIT_CLIENT_CERT_PATH: /etc/strongswan/ipsec.d/certs/{{USERNAME}}Cert.pem
+      - IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH: /etc/strongswan/{{USERNAME}}.p12
+    tasks:
+      - name: Prepare the script for User creation
+        template:
+          src: templates/configuration/add_client.sh.j2
+          dest: /etc/strongswan/add_client.sh

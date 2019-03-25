@@ -1,0 +1,22 @@
+IPSEC_VIRTUAL_IP: 10.10.0.0/24
+IPSEC_PEER_AUTH_MODE: eap-mschapv2
+
+IPSEC_CA_DOMAIN_NAME: example.org
+
+IPSEC_CLIENT_ID: client
+IPSEC_SERVER_ID: vpn
+IPSEC_INTERFACE_IP:  192.168.25.185
+
+IPSEC_CA_PRIV_KEY_PATH: /etc/strongswan/ipsec.d/private/private_ca.pem
+IPSEC_CA_CERT_PATH:  /etc/strongswan/ipsec.d/cacerts/ca_cert.pem
+
+
+IPSEC_SERVER_PRIV_KEY_PATH: /etc/strongswan/ipsec.d/private/{{IPSEC_SERVER_ID}}Key.pem
+IPSEC_SERVER_CERT_PATH: /etc/strongswan/ipsec.d/certs/{{IPSEC_SERVER_ID}}Cert.pem
+
+
+IPSEC_INIT_CLIENT_PRIV_KEY_PATH: /etc/strongswan/ipsec.d/private/{{IPSEC_CLIENT_ID}}Key.pem
+IPSEC_INIT_CLIENT_CERT_PATH: /etc/strongswan/ipsec.d/certs/{{IPSEC_CLIENT_ID}}Cert.pem
+
+
+IPSEC_INIT_CLIENT_FINAL_BUNDLE_PATH: /etc/strongswan/{{IPSEC_CLIENT_ID}}.p12
