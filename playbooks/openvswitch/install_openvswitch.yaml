@@ -1,0 +1,38 @@
+---
+- hosts: openvswitch
+  vars_files:
+    - config/main.yaml
+  tasks:
+    - name: Ensure epel-release is installed
+      yum:
+        name: epel-release
+        state: latest
+    - name: Create a templorary folder
+      file:
+        path: /root/rpmbuild/SOURCES
+        state: directory
+    - name: Install dependencies
+      yum:
+        name: [wget, openssl-devel,  python-sphinx, python-six, gcc, make, python-devel, openssl-devel, kernel-devel, graphviz ,kernel-debug-devel, autoconf, automake, rpm-build, redhat-rpm-config, libtool, python-twisted-core, python-zope-interface, PyQt4, desktop-file-utils, libcap-ng-devel, groff, checkpolicy, selinux-policy-devel]
+    - name: Download source files for OpenVSwitch
+      get_url:
+        url: http://openvswitch.org/releases/openvswitch-2.9.2.tar.gz
+        dest: /root/rpmbuild/SOURCES
+    - name: Unarchive sources
+      unarchive:
+        src: /root/rpmbuild/SOURCES/openvswitch-2.9.2.tar.gz
+        dest: /root/rpmbuild/SOURCES
+        remote_src: yes
+    - name: Build sources with RPMBuild
+      command: rpmbuild -bb --nocheck /root/rpmbuild/SOURCES/openvswitch-2.9.2/rhel/openvswitch-fedora.spec
+    - name: Install package
+      yum:
+        name: /root/rpmbuild/RPMS/x86_64/openvswitch-2.9.2-1.el7.x86_64.rpm
+        state: present
+    - name: Run OpenVSwitch and make in autorunning
+      service:
+        name: openvswitch
+        state: restarted
+        enabled: yes
+    - name: Create first bridge
+      command: ovs-vsctl add-br ovs-br0
