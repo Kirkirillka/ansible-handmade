@@ -1,0 +1,27 @@
+---
+- hosts: suricata
+  vars_files:
+    - config/main.yaml
+  tasks:
+  - name: Ensure epel-release is installed
+    yum:
+      name: epel-release
+      state: latest
+  - name: Install suricata from repositories
+    yum:
+      name: [suricata,python-pip]
+      state: latest
+  - name: Install packages for Update rule
+    pip:
+      name: pyyaml
+  - name: Update suricata rules
+    command: suricata-update
+  - name: Apply Suricata configuration
+    copy:
+      src: templates/suricata.yaml
+      dest: /etc/suricata/suricata.yaml
+  - name: Restart suricata and make it autorunning
+    service:
+      name: suricata
+      state: restarted
+      enabled: yes
