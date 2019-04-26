@@ -1,0 +1,77 @@
+---
+- hosts: elk
+  vars_files:
+    - config/main.yaml
+  tasks:
+  - name: Ensure epel-release is installed
+    yum:
+      name: epel-release
+      state: latest
+  - name: Install Java
+    yum:
+      name: java-1.8.0
+      state: latest
+  - name: Import GPG key for ElasticSearch repository
+    rpm_key:
+      state: present
+      key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  - name: Deploy the repo template
+    template:
+      src: templates/elasticsearch.repo
+      dest: /etc/yum.repos.d/elasticsearch.repo
+  - name: Install ELK stack
+    yum:
+      name: [elasticsearch, logstash, kibana, filebeat, metricbeat]
+      state: latest
+  - name: Start ELK and make in autorunning
+    service:
+      name: "{{item}}"
+      enabled: yes
+      state: started
+    with_items:
+      - elasticsearch
+      - kibana
+      - logstash
+      - filebeat
+      - metricbeat
+  - name: Install nginx to work as a proxy server
+    yum:
+      name: nginx
+      state: latest
+  - name: Deploy nginx configuration to pass requests to Kibana
+    template:
+      src: templates/nginx.conf
+      dest: /etc/nginx/conf.d/kibana.conf
+  - name: Start nginx
+    service:
+      name: nginx
+      enabled: yes
+      state: started
+  - name: Copy configuration files for Logstash
+    copy:
+      src: "{{item}}"
+      dest: /etc/logstash/conf.d
+    with_items:
+      - templates/logstash/02-beats-input.conf
+      - templates/logstash/10-syslog-filter.conf
+      - templates/logstash/30-elasticsearch-output.conf
+  - name: Enable System logs collection
+    command: filebeat modules enable system
+  - name: Allow  local proxies connection in SELinux
+    command: setsebool httpd_can_network_connect 1 -P
+  - name: Allow connection through network
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+  - name: Restart services
+    service:
+      name: "{{item}}"
+      state: restarted
+    with_items:
+      - elasticsearch
+      - kibana
+      - logstash
+      - filebeat
+      - metricbeat
+      - nginx
