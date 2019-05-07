@@ -1,0 +1,39 @@
+---
+  - hosts: fastmon
+    vars_files:
+      - config/main.yaml
+    tasks:
+    - name: Download script for installation
+      get_url:
+        url: https://raw.githubusercontent.com/pavel-odintsov/fastnetmon/master/src/fastnetmon_install.pl
+        dest: /tmp/fastnetmon_install.pl
+        mode: 744
+    - name: Install Perl interpretator
+      yum:
+        name: perl
+        state: latest
+    - pip:
+        name: pexpect
+    - name: Disable Selinux
+      lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=disabled'
+    - name: Disable firewalld
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
+    - name: Deploy configuration
+      template:
+        src: template/fastnetmon.conf.j2
+        dest: /etc/fastnetmon.conf
+    - name: Start installation
+      expect:
+        command: perl /tmp/fastnetmon_install.pl
+        responses:
+          Email:
+            - "{{FASTNETMON_EMAIL}}"
+        timeout: 360
+      async: 360
+      poll: 5
