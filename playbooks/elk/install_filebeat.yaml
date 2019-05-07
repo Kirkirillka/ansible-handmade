@@ -1,0 +1,44 @@
+---
+- hosts: target
+  vars_files:
+    - config/main.yaml
+  tasks:
+  - name: Ensure epel-release is installed
+    yum:
+      name: epel-release
+      state: latest
+  - name: Install Java
+    yum:
+      name: java-1.8.0
+      state: latest
+  - name: Import GPG key for ElasticSearch repository
+    rpm_key:
+      state: present
+      key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  - name: Deploy the repo template
+    template:
+      src: templates/elasticsearch.repo
+      dest: /etc/yum.repos.d/elasticsearch.repo
+  - name: Install Filebeat and Metricbeat
+    yum:
+      name: [ filebeat, metricbeat]
+      state: latest
+  - name: Start Filebeat and Metricbeat and make in autorunning
+    service:
+      name: "{{item}}"
+      enabled: yes
+      state: started
+    with_items:
+      - filebeat
+      - metricbeat
+  - name: Deploy Filebeat configuration
+    template:
+      src: templates/filebeat/filebeat.yml
+      dest: /etc/filebeat/filebeat.yml
+  - name: Restart services
+    service:
+      name: "{{item}}"
+      state: restarted
+    with_items:
+      - filebeat
+      - metricbeat
