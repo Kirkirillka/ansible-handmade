@@ -20,6 +20,11 @@
     copy:
       src: templates/suricata.yaml
       dest: /etc/suricata/suricata.yaml
+  - name: Update environment file
+    lineinfile:
+      path: /etc/sysconfig/suricata
+      regexp: "OPTIONS"
+      line: OPTIONS="-i {{SURICATA_INTERFACE}} --user suricata "
   - name: Restart suricata and make it autorunning
     service:
       name: suricata

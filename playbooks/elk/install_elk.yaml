@@ -23,17 +23,6 @@
     yum:
       name: [elasticsearch, logstash, kibana, filebeat, metricbeat]
       state: latest
-  - name: Start ELK and make in autorunning
-    service:
-      name: "{{item}}"
-      enabled: yes
-      state: started
-    with_items:
-      - elasticsearch
-      - kibana
-      - logstash
-      - filebeat
-      - metricbeat
   - name: Install nginx to work as a proxy server
     yum:
       name: nginx
@@ -48,30 +37,52 @@
       enabled: yes
       state: started
   - name: Copy configuration files for Logstash
-    copy:
-      src: "{{item}}"
-      dest: /etc/logstash/conf.d
+    template:
+      src: "templates/logstash/{{item}}"
+      dest: /etc/logstash/conf.d/"{{item}}"
     with_items:
-      - templates/logstash/02-beats-input.conf
-      - templates/logstash/10-syslog-filter.conf
-      - templates/logstash/30-elasticsearch-output.conf
+      - 02-beats-input.conf
+      - 10-syslog-filter.conf
+      - 30-elasticsearch-output.conf
+  - name: Make Elasticsearch listen on all interfaces
+    lineinfile:
+      path: /etc/elasticsearch/elasticsearch.yml
+      line: "{{item}}"
+    with_items:
+      - "network.bind_host: 0.0.0.0"
+      - "node.master: true"
+      - "node.data: true"
+      - "transport.host: localhost"
+      - "transport.tcp.port: 9300"
   - name: Enable System logs collection
     command: filebeat modules enable system
   - name: Allow  local proxies connection in SELinux
     command: setsebool httpd_can_network_connect 1 -P
-  - name: Allow connection through network
+    ignore_errors: yes
+  - name: Allow connection through network to HTTP WebGUI
     firewalld:
       service: http
       permanent: yes
       state: enabled
-  - name: Restart services
+  - name: Allow connection through firewalld to EL stack
+    firewalld:
+      port: "{{item}}"
+      permanent: yes
+      state: enabled
+    with_items:
+      - 9300/tcp
+      - 9200/tcp
+      - 514/tcp
+      - 514/udp
+      - 5044/tcp
+  - name: Start ELK and make in autorunning
     service:
       name: "{{item}}"
-      state: restarted
+      enabled: yes
+      state: started
     with_items:
       - elasticsearch
       - kibana
       - logstash
       - filebeat
       - metricbeat
-      - nginx
