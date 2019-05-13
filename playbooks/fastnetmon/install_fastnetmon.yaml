@@ -12,6 +12,10 @@
       yum:
         name: perl
         state: latest
+    - name: Install Pip
+      yum:
+        name: [python-pip]
+        state: latest
     - pip:
         name: pexpect
     - name: Disable Selinux
@@ -28,12 +32,16 @@
       template:
         src: template/fastnetmon.conf.j2
         dest: /etc/fastnetmon.conf
+    - name: Copy a script to notify about attacks
+      template:
+        src: template/notify_about_attack.sh.j2
+        dest: /usr/local/bin/notify_about_attack.sh
     - name: Start installation
       expect:
         command: perl /tmp/fastnetmon_install.pl
         responses:
           Email:
             - "{{FASTNETMON_EMAIL}}"
-        timeout: 360
-      async: 360
+        timeout: 6000
+      async: 6000
       poll: 5

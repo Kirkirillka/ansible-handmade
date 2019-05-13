@@ -34,7 +34,7 @@ unban_only_if_attack_finished = on
 
 # enable per subnet speed meters
 # For each subnet, list track speed in bps and pps for both directions
-enable_subnet_counters = off
+enable_subnet_counters = on
 
 # list of all your networks in CIDR format
 networks_list_path = /etc/networks_list
@@ -47,12 +47,12 @@ check_period = 1
 
 # Connection tracking is very useful for attack detection because it provides huge amounts of information,
 # but it's very CPU intensive and not recommended in big networks
-enable_connection_tracking = off
+enable_connection_tracking = on
 
 # Different approaches to attack detection
 ban_for_pps = on
 ban_for_bandwidth = on
-ban_for_flows = off
+ban_for_flows = on
 
 # Limits for Dos/DDoS attacks
 threshold_pps = 20000
