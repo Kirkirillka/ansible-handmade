@@ -35,4 +35,43 @@
         state: restarted
         enabled: yes
     - name: Create first bridge
-      command: ovs-vsctl add-br ovs-br0
+      command: ovs-vsctl add-br ovsbridge0
+      ignore_errors: yes
+    - name: Deploy network-script template for OVS bridge
+      template:
+        src: templates/ifcfg-ovsbridge0
+        dest: /etc/sysconfig/network-scripts/ifcfg-ovsbridge0
+    - name: Deploy an extra management interface and connect it to OVS Bridge
+      template:
+        src: templates/ifcfg-mgmt0
+        dest: /etc/sysconfig/network-scripts/ifcfg-mgmt0
+    - name: Deploy an route establish script at start-up
+      template:
+        src: templates/route-ovsbridge0
+        dest: /etc/sysconfig/network-scripts/route-ovsbridge0
+    - name: Flush BOOTPROTO Parameter
+      lineinfile:
+        path: "/etc/sysconfig/network-scripts/ifcfg-{{item}}"
+        line: "BOOTPROTO=none"
+        regexp: "^BOOTPROTO.*"
+      with_items:
+        - "{{ OVS_PORTS }}"
+    - name: Flush IP addresses from physical interfaces
+      lineinfile:
+        path: "/etc/sysconfig/network-scripts/ifcfg-{{item}}"
+        state: absent
+        regexp: "^IPADDR.*"
+      with_items:
+        - "{{ OVS_PORTS }}"
+    - name: Add physical interfaces to OVS bridge
+      lineinfile:
+        path: "/etc/sysconfig/network-scripts/ifcfg-{{item[0]}}"
+        line: "{{item[1]}}"
+        state: present
+      with_nested:
+        - "{{ OVS_PORTS }}"
+        - ["TYPE=OVSPort","DEVICETYPE=ovs","OVS_BRIDGE=ovsbridge0"]
+    - name: Restarted network service
+      service:
+        name: network
+        state: restarted

@@ -34,7 +34,7 @@ systemctl start openvswitch.service
 systemctl enable openvswitch.service
 
 # Create first bridge
-ovs-vsctl add-br ovs-br0
+ovs-vsctl add-br ovsbridge0
 
 # At this step, you may add as many host interfaces as you want
-# The bridge ovs-br0 seems as another interface in your machine, so you can use NetworkManager to automatically boot it and set up (via /etc/sysconfig/network-scripts/ifcfg-ovs-vr0). It was tested against DHCP server to sucessfully lease an IP address and to be able to communicate over network.
+# The bridge ovsbridge0 seems as another interface in your machine, so you can use NetworkManager to automatically boot it and set up (via /etc/sysconfig/network-scripts/ifcfg-ovs-vr0). It was tested against DHCP server to sucessfully lease an IP address and to be able to communicate over network.

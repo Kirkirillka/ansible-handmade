@@ -1,0 +1,5 @@
+# Put here physical ports you want to be plugged into OpenVSwitch bridge
+OVS_PORTS: ['ens192',]
+
+# Default gateway
+OVS_DEFAULT_GATE: 192.168.0.254
