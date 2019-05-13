@@ -1,4 +1,4 @@
-DEVICE="ovsbr0"
+DEVICE="ovsbridge0"
 ONBOOT="yes"
 DEVICETYPE="ovs"
 TYPE="OVSBridge"
