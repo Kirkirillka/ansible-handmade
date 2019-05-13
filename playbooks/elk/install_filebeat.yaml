@@ -23,7 +23,7 @@
     yum:
       name: [ filebeat, metricbeat]
       state: latest
-  - name: Start Filebeat and Metricbeat and make in autorunning
+  - name: Start Filebeat and Metricbeat and make it autorunning
     service:
       name: "{{item}}"
       enabled: yes
@@ -35,6 +35,14 @@
     template:
       src: templates/filebeat/filebeat.yml
       dest: /etc/filebeat/filebeat.yml
+  - name: Deploy Metricbeat configuration
+    template:
+      src: templates/metricbeat/metricbeat.yml
+      dest: /etc/metricbeat/metricbeat.yml
+  - name: Setup Metricbeat and enable Elasticsearch and Kibana dashboards, visualizations and indexes
+    command: metricbeat modules enable system &&  metricbeat setup
+  - name: Setup File and enable Elasticsearch and Kibana dashboards, visualizations and indexes
+    command: filebeat modules enable system &&  filebeat setup
   - name: Restart services
     service:
       name: "{{item}}"
