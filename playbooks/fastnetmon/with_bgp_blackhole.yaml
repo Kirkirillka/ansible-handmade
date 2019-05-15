@@ -1,0 +1,25 @@
+---
+  - hosts: fastmon
+    vars_files:
+      - config/main.yaml
+      - config/exabgp.yaml
+    tasks:
+    - name: Install socat
+      yum:
+        name: socat
+        state: latest
+    - name: Install exabgp
+      pip:
+        name: exabgp
+        state: latest
+    - name: Deploy configuration for exabgp
+      template:
+        src: template/exabgp_blackhole.conf
+        dest: /etc/exabgp_blackhole.conf
+
+
+# env exabgp.daemon.user=root exabgp.daemon.daemonize=false exabgp.dmon.pid=/var/run/exabgp.pid exabgp.log.destination=/var/log/exabgp.log exabgp /etc/exabgp_blackhole.conf
+
+# echo "announce route 10.10.10.123/32 next-hop 10.0.3.114 community 65001:666" > /var/run/exabgp.cmd
+
+# echo "announce route 10.10.10.123/32 next-hop 10.0.3.114 community 65001:666" > /var/run/exabgp.cmd
