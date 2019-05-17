@@ -40,9 +40,17 @@
       src: templates/metricbeat/metricbeat.yml
       dest: /etc/metricbeat/metricbeat.yml
   - name: Setup Metricbeat and enable Elasticsearch and Kibana dashboards, visualizations and indexes
-    command: metricbeat modules enable system &&  metricbeat setup
+    command: "metricbeat modules enable {{item}}"
+    with_items:
+      - "{{METRICBEAT_ENABLED_MODULES}}"
   - name: Setup File and enable Elasticsearch and Kibana dashboards, visualizations and indexes
-    command: filebeat modules enable system &&  filebeat setup
+    command: "filebeat modules enable {{item}}"
+    with_items:
+      - "{{FILEBEAT_ENABLED_MODULES}}"
+  - name: Setup modules for Filebeat
+    command: filebeat setup
+  - name: Setup modules for Metricbeat
+    command: metricbeat setup
   - name: Restart services
     service:
       name: "{{item}}"
