@@ -17,7 +17,7 @@
   - name: Update suricata rules
     command: suricata-update
   - name: Apply Suricata configuration
-    copy:
+    template:
       src: templates/suricata.yaml
       dest: /etc/suricata/suricata.yaml
   - name: Update environment file
