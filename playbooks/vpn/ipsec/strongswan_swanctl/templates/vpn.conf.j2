@@ -1,39 +1,147 @@
 connections {
 
-   vpn {
-      local_addrs  = {{IPSEC_IP}}
-      pools = rw_pool
+   ikev2-pubkey {
+        version = 2
+        proposals =  aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+        rekey_time = 0s
+        pools = rw_pool
+        fragmentation = yes
+        dpd_delay = 30s
+        # dpd_timeout doesn't do anything for IKEv2. The general IKEv2 packet timeouts are used.
+        local-1 {
+            certs =  {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+            id = {{IPSEC_FQDN}}
+        }
+        remote-1 {
+            # defaults are fine.
+        }
+        children {
+            ikev2-pubkey {
+                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                rekey_time = 0s
+                dpd_action = clear
+                esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+                updown = /usr/libexec/strongswan/_updown iptables
+            }
+        }
+    }
 
-      local {
-         auth = pubkey
-         certs = {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
-         id = {{IPSEC_FQDN}}
-      }
-      remote {
-         #auth = pubkey
-         auth = eap-tls
-         # go ask the client for its eap identity.
-      }
-      children {
-         vpn {
-            local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+    ikev2-eap {
+        version = 2
+        proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+        rekey_time = 0s
+        pools = rw_pool
+        fragmentation = yes
+        dpd_delay = 30s
+        # dpd_timeout doesn't do anything for IKEv2. The general IKEv2 packet timeouts are used.
+        local-1 {
+            certs =  {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+            id = {{IPSEC_FQDN}}
+        }
+        remote-1 {
+            auth = eap-dynamic
+            # go ask the client for its eap identity.
+            eap_id = %any
+        }
+        children {
+            ikev2-eap {
+                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                rekey_time = 0s
+                dpd_action = clear
+                esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+                updown = /usr/libexec/strongswan/_updown iptables
+            }
+        }
+    }
+    ikev2-eap-tls-asymmetric {
+        version = 2
+        proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+        rekey_time = 0s
+        pools = rw_pool
+        fragmentation = yes
+        dpd_delay = 30s
+        # dpd_timeout doesn't do anything for IKEv2. The general IKEv2 packet timeouts are used.
+        local-1 {
+            certs =  {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+            id = {{IPSEC_FQDN}}
+        }
+        remote-1 {
+            auth = eap-tls
+            # go ask the client for its eap identity.
+            eap_id = %any
+        }
+        children {
+            ikev2-eap-tls-asymmetric {
+                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                rekey_time = 0s
+                dpd_action = clear
+                esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+                updown = /usr/libexec/strongswan/_updown iptables
+            }
+        }
+    }
 
-
-            updown = /usr/libexec/strongswan/_updown iptables
-            rekey_time = 5400
-            rekey_bytes = 500000000
-            rekey_packets = 1000000
-            esp_proposals = default
-         }
-      }
-      version = 2
-      proposals = aes192gcm16-aes128gcm16-prfsha256-ecp256-ecp521,aes192-sha256-modp3072,default
-   }
+    ikev2-eap-tls-symmetric {
+        version = 2
+        proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+        rekey_time = 0s
+        pools = rw_pool
+        fragmentation = yes
+        dpd_delay = 30s
+        # dpd_timeout doesn't do anything for IKEv2. The general IKEv2 packet timeouts are used.
+        local-1 {
+            certs =  {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+            id = {{IPSEC_FQDN}}
+            auth = eap-tls
+        }
+        remote-1 {
+            auth = eap-tls
+            # go ask the client for its eap identity.
+            eap_id = %any
+        }
+        children {
+            ikev2-eap-tls-symmetric {
+                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                rekey_time = 0s
+                dpd_action = clear
+                esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+                updown = /usr/libexec/strongswan/_updown iptables
+            }
+        }
+    }
+    ikev2-eap-mschapv2 {
+        version = 2
+        proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+        rekey_time = 0s
+        pools = rw_pool
+        fragmentation = yes
+        dpd_delay = 30s
+        # dpd_timeout doesn't do anything for IKEv2. The general IKEv2 packet timeouts are used.
+        local-1 {
+            certs =  {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+            id = {{IPSEC_FQDN}}
+        }
+        remote-1 {
+            auth = eap-mschapv2
+            # go ask the client for its eap identity.
+            eap_id = %any
+        }
+        children {
+            ikev2-eap-mschapv2 {
+                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                rekey_time = 0s
+                dpd_action = clear
+                esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
+                updown = /usr/libexec/strongswan/_updown iptables
+            }
+        }
+    }
 }
 
 
 pools {
         rw_pool  {
                 addrs = {{IPSEC_ENCRYPTION_DOMAIN}}
+                dns = 31.13.128.172, 31.13.128.173
         }
 }

@@ -1,10 +1,9 @@
 IPSEC_USERS:
-- k.kukarcev
+- user
 - admin
 - network
 
 
 IPSEC_USER_MAPPING:  {
-    client: "admin",
-    client2: "k.kukarcev"
+    "172.17.165.211": "user",
   }

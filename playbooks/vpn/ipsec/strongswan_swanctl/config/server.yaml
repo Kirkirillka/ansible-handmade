@@ -1,6 +1,6 @@
 IPSEC_KEY_NAME: ipsec_key.pem
 IPSEC_CERT_NAME: ipsec_cert.pem
-IPSEC_IP: 192.168.3.254
+IPSEC_IP: 172.17.165.219
 IPSEC_FQDN: moon.strongswan.org
 IPSEC_DN: "C=RU, O=IT-Park, CN={{IPSEC_FQDN}}"
 

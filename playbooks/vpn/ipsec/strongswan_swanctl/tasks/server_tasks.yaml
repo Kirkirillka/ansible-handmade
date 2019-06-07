@@ -14,6 +14,21 @@
 - name: Disable SELinux temporarily
   shell: setenforce 0
   ignore_errors: yes
+- name: Allow traffic via firewalld
+  firewalld:
+    service: ipsec
+    permanent: yes
+    state: enabled
+- name: Enable IP Forwarding
+  lineinfile:
+    line: "{{item}}"
+    path: /etc/sysctl.conf
+    state: present
+  with_items:
+    - net.ipv4.ip_forward = 1
+    - net.ipv6.conf.all.forwarding=1
+- name: Apply sysctl parameters
+  command: sysctl -p
 - name: Start services
   service:
     name: "{{ item }}"
@@ -26,3 +41,12 @@
   shell: /sbin/strongswan pki --gen --type rsa --size 2048 --outform pem > {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}}
 - name: Generate Certificate for VPN IPSec server to authenticate this side
   shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn "{{IPSEC_DN}}" --san {{IPSEC_FQDN}} --flag serverAuth --flag ikeIntermediate --outform pem > {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+- name: Apply strongswan configuration (swanctl used)
+  template:
+    src: ../templates/vpn.conf.j2
+    dest: "{{ IPSEC_CONF_PATH }}/vpn.conf"
+- name: Run swanctl to apply configuration
+  service:
+    name: strongswan-swanctl
+    state: restarted
+    enabled: yes

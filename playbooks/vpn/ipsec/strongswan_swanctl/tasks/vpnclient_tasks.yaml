@@ -14,11 +14,11 @@
 - name: Disable SELinux temporarily
   shell: setenforce 0
   ignore_errors: yes
-- name: Start services
-  service:
-    name: strongswan
-    state: started
-    enabled: yes
+- name: Allow traffic via firewalld
+  firewalld:
+    service: ipsec
+    permanent: yes
+    state: enabled
 - name: Apply configuration on the "{{user}}"
   template:
     src: ../templates/client.conf.j2

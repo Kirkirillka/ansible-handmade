@@ -1,0 +1,9 @@
+{
+    "type": "sftp",
+    "host": "192.168.196.198",
+    "username": "vagrant",
+    "password": "vagrant",
+    "port": 22,
+    "remotePath": "/home/vagrant/playbooks",
+    "uploadOnSave": true
+}
