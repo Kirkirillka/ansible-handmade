@@ -17,7 +17,7 @@ connections {
         }
         children {
             ikev2-pubkey {
-                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                local_ts = {{IPSEC_ADVERTISE_DOMAIN}}
                 rekey_time = 0s
                 dpd_action = clear
                 esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
@@ -45,7 +45,7 @@ connections {
         }
         children {
             ikev2-eap {
-                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                local_ts = {{IPSEC_ADVERTISE_DOMAIN}}
                 rekey_time = 0s
                 dpd_action = clear
                 esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
@@ -72,7 +72,7 @@ connections {
         }
         children {
             ikev2-eap-tls-asymmetric {
-                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                local_ts = {{IPSEC_ADVERTISE_DOMAIN}}
                 rekey_time = 0s
                 dpd_action = clear
                 esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
@@ -101,7 +101,7 @@ connections {
         }
         children {
             ikev2-eap-tls-symmetric {
-                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                local_ts = {{IPSEC_ADVERTISE_DOMAIN}}
                 rekey_time = 0s
                 dpd_action = clear
                 esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
@@ -128,7 +128,7 @@ connections {
         }
         children {
             ikev2-eap-mschapv2 {
-                local_ts = {{IPSEC_ENCRYPTION_DOMAIN}}
+                local_ts = {{IPSEC_ADVERTISE_DOMAIN}}
                 rekey_time = 0s
                 dpd_action = clear
                 esp_proposals = aes128-aes256-sha2_256-sha256--prfsha256-prfsha384-modp1024-modp3072-modp2048, default
@@ -142,6 +142,29 @@ connections {
 pools {
         rw_pool  {
                 addrs = {{IPSEC_ENCRYPTION_DOMAIN}}
-                dns = 31.13.128.172, 31.13.128.173
+                dns = {{IPSEC_ADVERTISE_DNS}}
         }
+}
+
+
+
+secrets {
+
+   eap-carol {
+      id = carol
+      secret = Ar3etTnp
+   }
+   eap-dave {
+      id = dave
+      secret = W7R0g3do
+   }
+   eap-user {
+      id = user
+      secret = 123456
+   }
+
+   ike-any {
+      id = psk-user
+      secret = 123456
+   }
 }
