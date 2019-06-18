@@ -42,10 +42,28 @@
   shell: /sbin/strongswan pki --gen --type rsa --size 2048 --outform pem > {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}}
 - name: Generate Certificate for VPN IPSec server to authenticate this side
   shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}} --type rsa | /sbin/strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn "{{IPSEC_DN}}" --san {{IPSEC_FQDN}} --san @{{IPSEC_IP}} --san dns:{{IPSEC_IP}} --flag serverAuth  --flag clientAuth --flag ikeIntermediate --outform pem > {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
-- name: Apply strongswan configuration (swanctl used)
+- name: Save static secrets for IPSec users
   template:
-    src: ../templates/vpn.conf.j2
-    dest: "{{ IPSEC_CONF_PATH }}/vpn.conf"
+    src: ../templates/conns/secrets.conf
+    dest: "{{ IPSEC_CONF_PATH }}/secrets.conf"
+- name: Save network pools for IPSec users
+  template:
+    src: ../templates/conns/pools.conf
+    dest: "{{ IPSEC_CONF_PATH }}/pools.conf"
+- name: Apply strongswan VPN Connections configuration (swanctl used)
+  template:
+    src: "../templates/conns/ikev2_{{item}}.conf"
+    dest: "{{ IPSEC_CONF_PATH }}/ikev2_{{item}}.conf"
+  with_items:
+    - eap
+    - eap-mschapv2
+    - eap-peap
+    - eap-radius
+    - pubkey
+- name: Apply EAP-RADIUS configuration (charon used)
+  template:
+    src: ../templates/eap-radius.conf.j2
+    dest:  /etc/strongswan/strongswan.d/charon/eap-radius.conf
 - name: Run swanctl to apply configuration
   service:
     name: strongswan-swanctl
