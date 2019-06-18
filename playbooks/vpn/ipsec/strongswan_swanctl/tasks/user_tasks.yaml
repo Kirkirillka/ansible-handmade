@@ -3,8 +3,7 @@
 
 
 - name: Generate Self-Signed Certificate for "{{user}}"
-  shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{user}}_key.pem --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn 'C=RU, O=IT Park Clients, CN={{user}}@{{CA_FQDN}}' --san {{user}}.{{CA_FQDN}} --outform pem > {{IPSEC_CERT_PATH}}/{{user}}_cert.pem
-
+  shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{user}}_key.pem --type rsa | /sbin/strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn 'C=RU, O=IT Park Clients, CN={{user}}' --san {{user}} --flag clientAuth --outform pem > {{IPSEC_CERT_PATH}}/{{user}}_cert.pem
 
 - name: Bundle's private key, certificate and CA certificate for "{{user}}"
   shell: openssl pkcs12 -export  -inkey {{IPSEC_PRIV_KEY_PATH}}/{{user}}_key.pem -in {{IPSEC_CERT_PATH}}/{{user}}_cert.pem  -certfile {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} -out {{IPSEC_PKCS12_PATH}}/{{user}}_bundle.p12 -passout pass:{{user}}

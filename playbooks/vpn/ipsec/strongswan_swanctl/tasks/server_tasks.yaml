@@ -18,6 +18,7 @@
   firewalld:
     service: ipsec
     permanent: yes
+    zone: public
     state: enabled
 - name: Enable IP Forwarding
   lineinfile:
@@ -40,7 +41,7 @@
 - name: Generate private key for VPN IPSec server
   shell: /sbin/strongswan pki --gen --type rsa --size 2048 --outform pem > {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}}
 - name: Generate Certificate for VPN IPSec server to authenticate this side
-  shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}} --type rsa | strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn "{{IPSEC_DN}}" --san {{IPSEC_FQDN}} --flag serverAuth --flag ikeIntermediate --outform pem > {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
+  shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}} --type rsa | /sbin/strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn "{{IPSEC_DN}}" --san {{IPSEC_FQDN}} --san @{{IPSEC_IP}} --san dns:{{IPSEC_IP}} --flag serverAuth  --flag clientAuth --flag ikeIntermediate --outform pem > {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
 - name: Apply strongswan configuration (swanctl used)
   template:
     src: ../templates/vpn.conf.j2
