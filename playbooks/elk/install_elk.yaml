@@ -64,7 +64,7 @@
       service: http
       permanent: yes
       state: enabled
-  - name: Allow connection through firewalld to EL stack
+  - name: Allow connection through firewalld to ELK stack
     firewalld:
       port: "{{item}}"
       permanent: yes
