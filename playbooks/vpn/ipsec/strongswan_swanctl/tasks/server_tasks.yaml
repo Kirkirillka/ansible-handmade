@@ -56,8 +56,8 @@
     dest: "{{ IPSEC_CONF_PATH }}/ikev2_{{item}}.conf"
   with_items:
     - eap
-    - eap-mschapv2
-    - eap-peap
+    #- eap-mschapv2
+    #- eap-peap
     - eap-radius
     - pubkey
 - name: Apply EAP-RADIUS configuration (charon used)
