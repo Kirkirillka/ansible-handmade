@@ -29,7 +29,7 @@ eap-radius {
     load = yes
 
     # NAS-Identifier to include in RADIUS messages.
-    nas_identifier = {{IPSEC}}
+    nas_identifier = {{RADIUS_IPSEC_NAME}}
 
     # Port of RADIUS server (authentication).
     # port = 1812
@@ -75,10 +75,9 @@ eap-radius {
     servers {
 
         radiusServer {
-                secret = {{RADIUS-SECRET}}
-                nas_identifier = {{RADIUS-NAS-NAME}}
-                socket = 5
-                address = {{RADIUS-IPADDR}}
+                secret = {{RADIUS_SECRET}}
+                nas_identifier = {{RADIUS_NAS_NAME}}
+                address = {{RADIUS_IPADDR}}
         }
     }
 
