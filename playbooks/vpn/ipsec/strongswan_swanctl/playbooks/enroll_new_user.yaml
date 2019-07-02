@@ -1,0 +1,28 @@
+- hosts: ca
+  tasks:
+    - name: Include Variables
+      include_vars:
+        dir: ../config
+        extensions:
+          - yaml
+    - name: Create Users
+      include: ../tasks/user_tasks.yaml user={{item}}
+      with_items: '{{NEW_USERS}}'
+    - name: Reload new configuration
+      service:
+        name: strongswan-swanctl
+        state: reloaded
+
+- hosts: ipsec
+  tasks:
+    - name: Upload user's certificates on IPSec server
+      copy:
+        src: "../endpoints/{{user}}/{{user}}_cert.pem"
+        dest: "{{IPSEC_CERT_PATH}}"
+      with_items: "{{NEW_USERS}}"
+      loop_control:
+            loop_var: user
+    - name: Reload new configuration
+      service:
+        name: strongswan-swanctl
+        state: reloaded
