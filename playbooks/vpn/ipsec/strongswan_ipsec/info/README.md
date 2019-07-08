@@ -17,7 +17,7 @@
 
 # What is IPSec?
 
-IPSec (eng. Internet Protocol Security) - a set of open standards for trusted encrypted connection over IP-networks. It supports many mitigations against network attacks:
+IPSec (eng. Internet Protocol Security) - a set of open standards for trusted encrypted connection over IP-networks.  It supports many mitigations against network attacks:
 
 - Network-level authentication
 - Integrity checking
@@ -103,7 +103,7 @@ This uses RSA, ECDSA or EdDSA X.509 certificates.
 
 1. Certificates can be self-signed. In this way, certificates have to be installed on both peers, or to be signed by a trusted Certificate Authority (CA), e.g. Let's Encrypt.
 2. To store private keys, smart cards may be used via the PKCS#11 plugin
-3. To prevent MITM, the certificate has contain the *subject* or a *subjectAltName* to check the identity claimed by the peer
+3. To prevent MITM, the certificate has to contain the *subject* or a *subjectAltName* to check the identity claimed by the peer
 
 #### Pre-Shared-Key (PSK)
 Much easy in deploy, but requires strong security, as if one peer is compromised, the whole system is compromised. This is not recommended for large scale deployments.
