@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    - name: Include Variables
+      include_vars:
+        dir: ../meta
+        extensions:
+          - yml
+    - name: Install strongswan
+      include_tasks: ../tasks/install_strongswan.yml
+    - name: Configure the Left Side of VPN Side-to-Side
+      include_tasks: ../tasks/conf_left_side.yml      
