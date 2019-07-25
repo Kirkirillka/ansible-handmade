@@ -17,16 +17,40 @@ connections {
             local_ts  = {{LEFT_TS_NETWORK}}
             remote_ts = {{RIGHT_TS_NETWORK}}
 
-            updown = /usr/local/libexec/ipsec/_updown iptables
+            updown = /usr/libexec/strongswan/_updown iptables
             rekey_time = 5400
             rekey_bytes = 500000000
             rekey_packets = 1000000
             esp_proposals = aes128gcm128-x25519
+            inactivity = 120s
+            start_action=trap
          }
       }
       version = 2
       mobike = no
       reauth_time = 10800
+      proposals = aes128-sha256-x25519
+   }
+
+   nat-t {
+
+      local {
+         auth = psk
+      }
+      remote {
+         auth = psk
+      }      
+
+      children {
+         nat-t {
+            local_ts = {{VPN_ADVERTISE}}
+
+            updown = /usr/libexec/strongswan/_updown iptables
+            esp_proposals = aes128gcm128-x25519
+            start_action=trap
+         }
+      }
+      version = 2
       proposals = aes128-sha256-x25519
    }
 }
@@ -37,4 +61,8 @@ secrets {
       id-right = {{RIGHT_SIDE_ID}}
       secret = {{PSK}}
    }
+
+   ike-nat-t {
+      secret = {{USER_PSK}}
+   }   
 }

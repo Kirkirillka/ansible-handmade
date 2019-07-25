@@ -7,5 +7,5 @@
     name: strongswan-swanctl
     state: restarted
     enabled: yes
-- name: Establish IPSec connection
-  shell: /usr/sbin/swanctl --initiate --child gw-gw
+#- name: Establish IPSec connection
+#  shell: /usr/sbin/swanctl --initiate --child net-net

@@ -1,0 +1,31 @@
+connections {
+
+   nat-t {
+      remote_addrs = {{VPN_IP}}
+
+      local {
+         auth = psk
+      }
+      remote {
+         auth = psk
+         id = {{VPN_IP}}
+      }
+      children {
+         nat-t {
+            remote_ts = {{VPN_ADVERTISE}}
+
+            updown = /usr/libexec/strongswan/_updown iptables
+            esp_proposals = aes128gcm128-x25519
+            start_action=trap
+         }
+      }
+      version = 2
+      proposals = aes128-sha256-x25519
+   }
+}
+
+secrets {
+   ike-user {
+      secret = {{USER_PSK}}
+   }
+}
