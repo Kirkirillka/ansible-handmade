@@ -14,7 +14,7 @@ connections {
       }
       children {
          net-net {
-            local_ts  = {{LEFT_TS_NETWORK}}
+            local_ts  = {{LEFT_TS_NETWORK}} , {{VPN_ADVERTISE}}
             remote_ts = {{RIGHT_TS_NETWORK}}
 
             updown = /usr/libexec/strongswan/_updown iptables
@@ -32,27 +32,6 @@ connections {
       proposals = aes128-sha256-x25519
    }
 
-   nat-t {
-
-      local {
-         auth = psk
-      }
-      remote {
-         auth = psk
-      }      
-
-      children {
-         nat-t {
-            local_ts = {{VPN_ADVERTISE}}
-
-            updown = /usr/libexec/strongswan/_updown iptables
-            esp_proposals = aes128gcm128-x25519
-            start_action=trap
-         }
-      }
-      version = 2
-      proposals = aes128-sha256-x25519
-   }
 }
 
 secrets {
@@ -61,8 +40,4 @@ secrets {
       id-right = {{RIGHT_SIDE_ID}}
       secret = {{PSK}}
    }
-
-   ike-nat-t {
-      secret = {{USER_PSK}}
-   }   
 }

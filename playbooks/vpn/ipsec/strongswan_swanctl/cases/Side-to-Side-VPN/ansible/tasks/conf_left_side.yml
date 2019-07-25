@@ -1,7 +1,11 @@
-- name: Apply strongswan VPN Connections configuration (swanctl used)
+- name: Apply conf for Side-to-Side VPN
   template:
     src: "../templates/left-side.conf.j2"
     dest: "{{ IPSEC_CONF_PATH }}/left-side.conf"
+- name: Apply conf for end-VPN users
+  template:
+    src: "../templates/roadwarrior.conf.j2"
+    dest: "{{ IPSEC_CONF_PATH }}/roadwarrior.conf"    
 - name: Run swanctl to apply configuration
   service:
     name: strongswan-swanctl
