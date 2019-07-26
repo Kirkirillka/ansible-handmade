@@ -2,7 +2,8 @@ connections {
 
    gw-gw {
       local_addrs  = {{LEFT_SIDE_IP}}
-      remote_addrs = {{RIGHT_SIDE_IP}}
+
+      encap = yes
 
       local {
          auth = psk
@@ -10,7 +11,6 @@ connections {
       }
       remote {
          auth = psk
-         id = {{RIGHT_SIDE_ID}}
       }
       children {
          net-net {
@@ -22,12 +22,15 @@ connections {
             rekey_bytes = 500000000
             rekey_packets = 1000000
             esp_proposals = aes128gcm128-x25519
-            inactivity = 120s
-            start_action=trap
+            
+
+            start_action = start
+            close_action = start
+            dpd_action = restart
+
          }
       }
       version = 2
-      mobike = no
       reauth_time = 10800
       proposals = aes128-sha256-x25519
    }

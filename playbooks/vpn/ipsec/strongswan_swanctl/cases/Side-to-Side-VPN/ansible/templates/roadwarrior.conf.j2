@@ -3,6 +3,8 @@ connections {
    roadwarrior-psk {
 
       pools = workers   
+      
+      encap = yes
 
       local {
          auth = psk
@@ -21,8 +23,12 @@ connections {
 
             updown = /usr/libexec/strongswan/_updown iptables
             esp_proposals = aes128gcm128-x25519
-            start_action=trap
-            dpd_action = clear
+
+            start_action = start
+            close_action = start
+            dpd_action = restart
+
+
          }
       }
       version = 2
