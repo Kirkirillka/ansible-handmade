@@ -1,0 +1,11 @@
+openvpn_push:
+  - route 10.11.13.0 255.255.255.0
+  - route 10.11.12.0 255.255.255.0
+  - route 10.11.30.0 255.255.255.0
+
+
+OPENVPN_CLIENTS_LAN:
+  internal_gateway:
+    - iroute 10.11.12.0 255.255.255.0
+    - iroute 10.11.30.0 255.255.255.0
+
