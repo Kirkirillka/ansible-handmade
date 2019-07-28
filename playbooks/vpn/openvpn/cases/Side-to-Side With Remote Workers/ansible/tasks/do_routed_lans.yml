@@ -10,4 +10,4 @@
 - name: "Start creating routes"      
   include_tasks:
     file: create_clients_routes.yml
-  with_dict: "{{OPENVPN_CLIENTS_LAN }}" 
+  with_dict: "{{openvpn_clients_lan }}" 
