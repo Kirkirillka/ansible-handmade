@@ -1,5 +1,8 @@
 # Full IPSec installation Ansible Role
 
+
+<img src="scheme.png" alt="drawing" width="50%"/>
+
 ## Requirements
 
 ### Operation systems
