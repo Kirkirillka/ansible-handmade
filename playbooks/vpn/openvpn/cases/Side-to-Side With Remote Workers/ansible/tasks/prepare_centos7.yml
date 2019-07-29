@@ -1,0 +1,10 @@
+- name: Install SELinux extra packages
+  yum:
+    name: selinux-policy-devel
+    state: latest
+- name: Allow OpenVPN to run on unusual port   
+  seport:
+    ports: "{{openvpn_port}}"
+    proto: "{{openvpn_proto}}"
+    setype: openvpn_port_t
+    state: present

@@ -1,0 +1,14 @@
+openvpn_proto: tcp
+openvpn_dualstack: false
+openvpn_redirect_gateway: false
+
+openvpn_client_register_dns: false
+
+openvpn_config_file: server
+
+openvpn_client_to_client: true
+openvpn_masquerade_not_snat: true
+
+openvpn_port: 4300
+
+clients: [internal_gateway, client1, client2]

@@ -1,0 +1,13 @@
+- name: Create a folder to store LAN configurations
+  file:
+      path: /etc/openvpn/ccd
+      state: directory
+- name: Force OpenVPN to enable client-side routed traffic
+  lineinfile:
+      path: "/etc/openvpn/{{openvpn_config_file}}.conf"
+      state: present
+      line: "client-config-dir /etc/openvpn/ccd"
+- name: "Start creating routes"      
+  include_tasks:
+    file: create_clients_routes.yml
+  with_dict: "{{openvpn_clients_lan }}" 

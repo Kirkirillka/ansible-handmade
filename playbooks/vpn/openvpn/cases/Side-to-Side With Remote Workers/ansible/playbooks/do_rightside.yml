@@ -1,0 +1,26 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Include variables
+      include_vars:
+       extensions: 
+        - yaml
+        - yml
+        - json
+       dir: ../meta/right_side
+    - name: Prepare CentOS7 host for OpenVPN role
+      import_tasks:
+        file: ../tasks/prepare_centos7.yml
+    - name: Include OpenVPN role
+      import_role: 
+        name: kyl191.openvpn
+    - name: Include Client-Side routing
+      import_tasks:
+        file: ../tasks/do_routed_lans.yml
+
+
+
+
+
+
+
