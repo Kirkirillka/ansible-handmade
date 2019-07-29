@@ -1,0 +1,110 @@
+---
+  - hosts: proxy
+    remote_user: vagrant
+    become: yes
+    vars_files:
+      - vars/3proxy_conf.yaml
+      - vars/default_user.yaml
+    tasks:
+      - name: Ensure a server has Epel repository
+        yum:
+          name: epel-release
+          state: installed
+      - name: Ensure a server has git installed
+        yum:
+          name: git
+          state: latest
+      - name: Ensure a server has GCC installed
+        yum:
+          name: gcc
+          state: latest
+      - name: Ensure a server has cmake installed
+        yum:
+          name: make
+          state: latest
+      - name: Create a system user account to run 3proxy over
+        user:
+          name: "{{user}}"
+          system: yes
+          shell: /sbin/nologin
+          state: present
+      - name: Clone 3proxy source code
+        git:
+          repo: https://github.com/z3APA3A/3proxy.git
+          dest: "{{ git_repo_save }}"
+      - name: Compile 3proxy
+        shell: cd "{{git_repo_save}}" && make
+      - name: Create A link to Makefile
+        file:
+          src: "{{ git_repo_save }}/Makefile.Linux"
+          dest: "{{ git_repo_save }}/Makefile"
+          state: link
+      - name: Generate systemd service file
+        template:
+          src: templates/systemd/3proxy.service.j2
+          dest: /usr/lib/systemd/system/3proxy.service
+      - name: Make sure your 3proxy is not already started
+        service:
+          name: 3proxy
+          state: stopped
+      - name: Run MAKE file
+        shell: cd "{{ git_repo_save }}" && make Makefile.Linux
+      - name: Create directory for 3proxy configuration
+        file:
+          path: "{{proxy_conf_dir}}"
+          state: directory
+          recurse: yes
+          mode: 0755
+      - name: Generate a configuration for 3proxy
+        template:
+          src: templates/cfg/3proxy.cfg.j2
+          dest: "{{ proxy_conf_dir }}/3proxy.cfg"
+      - name: Change permission for user to be able to access the configuration file
+        file:
+          path: "{{ proxy_conf_dir }}/3proxy.cfg"
+          owner: "{{user}}"
+          group: "{{user}}"
+          mode: 0644
+      - name: Create directory for 3proxy executables
+        file:
+          path: "{{proxy_exec_dir}}"
+          state: directory
+          mode: 0755
+      - name: Copy a 3proxy executables folder
+        shell: cp -R "{{git_repo_save}}/bin" "{{ proxy_exec_dir}}"
+      - name: Make links for 3proxy in PATH to be able to execute
+        file:
+          src: "{{ proxy_exec_dir }}/bin/3proxy"
+          dest: /usr/local/bin/3proxy
+          state: link
+      - name: Make links  for mycrypt in PATH to be able to execute
+        file:
+          src: "{{ proxy_exec_dir }}/bin/mycrypt"
+          dest: /usr/local/bin/mycrypt
+          state: link
+      # Prepare passwd file
+      - name: Make passwd file for user storage
+        file:
+          path: "{{ proxy_conf_dir }}/passwd"
+          state: touch
+      - name: Change permission for user to be able to access the password file
+        file:
+          path: "{{ proxy_conf_dir }}/passwd"
+          owner: "{{user}}"
+          group: "{{user}}"
+          mode: 0644
+      - name: Generate first user for proxy
+        shell: "echo {{test_username}}:`{{ proxy_exec_dir }}/bin/mycrypt {{test_salt}} {{test_password}}` > {{ proxy_conf_dir }}/passwd"
+      - name: Disable SELinux
+        shell : setenforce 0 || true && echo "SELINUX=disabled" >> /etc/selinux/config
+        ignore_errors: yes
+      - name: Set start-up of 3proxy  automatically by systemd
+        shell: systemctl enable 3proxy
+      - name: Restart 3proxy
+        service:
+          name: 3proxy
+          state: restarted
+
+    handlers:
+      - name: restart server
+        shell: reboot

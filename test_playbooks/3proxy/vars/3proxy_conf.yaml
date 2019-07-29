@@ -1,0 +1,8 @@
+git_repo_save: /var/src/3proxy
+proxy_conf_dir: /etc/3proxy/conf
+proxy_exec_dir: /usr/bin/3proxy
+http_https_port: 1234
+socks5_port: 1235
+ftp_port: 1236
+pop3_port: 1237
+user: 3proxy
