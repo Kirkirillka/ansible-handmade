@@ -1,0 +1,11 @@
+[Unit]
+Description=3proxy HTTP(S) and SOCKS proxy
+
+[Service]
+Type=simple
+ExecStart="{{proxy_exec_dir}}/bin/3proxy"  "{{proxy_conf_dir}}/3proxy.cfg"
+Restart=always
+User={{user}}
+
+[Install]
+WantedBy=multi-user.target
