@@ -6,3 +6,6 @@
   yum:
     name: strongswan, haveged, policycoreutils-python
     state: latest 
+  notify:
+    - restart strongswan
+    - enable strongswan    

@@ -8,3 +8,8 @@
   service:
     name: strongswan-swanctl
     enabled: yes
+- name: reload strongswan
+  become: yes
+  service:
+    name: strongswan-swanctl
+    state: reloaded 

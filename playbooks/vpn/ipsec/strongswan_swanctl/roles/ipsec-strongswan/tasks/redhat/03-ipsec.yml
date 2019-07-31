@@ -16,6 +16,4 @@
     src: vpn.conf.j2
     dest: "{{ IPSEC_CONF_PATH }}/vpn.conf"
   notify:
-    - restart strongswan
-    - enable strongswan
-  when: vpn_file_result.stat.exists != true or (FORCE is defined  and FORCE)      
+    - reload strongswan
