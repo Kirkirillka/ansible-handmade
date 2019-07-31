@@ -42,24 +42,10 @@
   shell: /sbin/strongswan pki --gen --type rsa --size 2048 --outform pem > {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}}
 - name: Generate Certificate for VPN IPSec server to authenticate this side
   shell: /sbin/strongswan pki --pub --in {{IPSEC_PRIV_KEY_PATH}}/{{IPSEC_KEY_NAME}} --type rsa | /sbin/strongswan pki --issue --lifetime 730 --cacert {{IPSEC_CERT_PATH}}/{{CA_CERT_NAME}} --cakey {{IPSEC_PRIV_KEY_PATH}}/{{CA_KEY_NAME}} --dn "{{IPSEC_DN}}" --san {{IPSEC_FQDN}} --san @{{IPSEC_IP}} --san dns:{{IPSEC_IP}} --flag serverAuth  --flag clientAuth --flag ikeIntermediate --outform pem > {{IPSEC_CERT_PATH}}/{{IPSEC_CERT_NAME}}
-- name: Apply strongswan VPN Connections configuration (swanctl used)
+- name: Apply strongswan configuration (swanctl used)
   template:
-    src: "../templates/vpn.conf.j2"
+    src: ../templates/vpn.conf.j2
     dest: "{{ IPSEC_CONF_PATH }}/vpn.conf"
-- name: Apply EAP-RADIUS configuration (charon used)
-  template:
-    src: ../templates/eap-radius.conf.j2
-    dest:  /etc/strongswan/strongswan.d/charon/eap-radius.conf
-- name: Set Phase 2 for EAP-TTLS to be RADIUS
-  lineinfile:
-    path: /etc/strongswan/strongswan.d/charon/eap-ttls.conf
-    regexp: '# phase2_method'
-    line: "phase2_method = radius"
-- name: Set Preferred EAP methods for EAP-DYNAMIC module
-  lineinfile:
-    path: /etc/strongswan/strongswan.d/charon/eap-dynamic.conf
-    regexp: '# preferred'
-    line: "preferred = eap-tls"
 - name: Run swanctl to apply configuration
   service:
     name: strongswan-swanctl

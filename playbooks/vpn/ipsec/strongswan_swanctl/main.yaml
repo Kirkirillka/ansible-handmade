@@ -1,9 +1,0 @@
----
-  - name: Initialize CA
-    import_playbook: playbooks/init_ca.yaml
-  - name: Initialize IPSec server
-    import_playbook: playbooks/init_ipsec.yaml
-  - name: Generate users PKI credentials
-    import_playbook: playbooks/init_users.yaml
-  - name: Up client's connection
-    import_playbook: playbooks/init_conn.yaml

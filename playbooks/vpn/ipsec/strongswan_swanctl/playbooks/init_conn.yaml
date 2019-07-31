@@ -1,9 +1,0 @@
-- hosts: clients
-  tasks:
-    - name: Include Variables
-      include_vars:
-        dir: ../config
-        extensions:
-          - yaml
-    - name: Apply IPSec configuration
-      include: ../tasks/vpnclient_tasks.yaml  user={{IPSEC_USER_MAPPING[inventory_hostname]}}

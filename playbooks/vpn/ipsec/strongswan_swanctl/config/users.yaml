@@ -1,9 +1,0 @@
-IPSEC_USERS:
-- user
-- admin
-- network
-
-
-IPSEC_USER_MAPPING:  {
-    "172.17.165.211": "user",
-  }
