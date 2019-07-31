@@ -1,4 +1,4 @@
-- name: Check if a "{{user}}" keypair  is enrolled
+- name: Check if a "{{user}}" keypair  is issued
   stat: 
     path: "{{IPSEC_PRIV_KEY_PATH}}/{{user}}_key.pem"
   register: user_file_result
