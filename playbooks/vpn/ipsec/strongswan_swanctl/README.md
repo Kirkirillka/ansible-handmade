@@ -17,28 +17,28 @@ IPSec IKEv2 methods supported:
 - EAP with certificates
 - EAP-TLS
 
-The role is intended to run against Linux-based machines, to install credentials on MacOS/Windows/Android see [link](https://www.strongswan.org/docs/dfn_berlin_2011.pdf). `Strongswan` is intended to use as IKE keyring daemon. It will establish a policy-based VPN connection (difference between interface-based and policy-based VPN see [here](http://www.internet-computer-security.com/VPN-Guide/Policy-based-vs-Route-based-VPN.html) or [here](https://www.juniper.net/documentation/en_US/release-independent/nce/topics/concept/policy-based-route-based-vpn-comparing.html)).
+The role is intended to run against Linux-based machines, to install credentials on macOS/Windows/Android see [link](https://www.strongswan.org/docs/dfn_berlin_2011.pdf). `Strongswan` is intended to use as IKE keyring daemon. It will establish a policy-based VPN connection (difference between interface-based and policy-based VPN see [here](http://www.internet-computer-security.com/VPN-Guide/Policy-based-vs-Route-based-VPN.html) or [here](https://www.juniper.net/documentation/en_US/release-independent/nce/topics/concept/policy-based-route-based-vpn-comparing.html)).
 
-This role will create a Certificate Authority center (CA), a running IPSec linux server, install packages on clients' machines, automatically deploy all necessary certificates and up connections.
+This role will create a Certificate Authority center (CA), a running IPSec Linux server.
 
 By default, IKEv2-TLS with certificates is used, you may change the behavior by choosing a specific EAP-* method (see [this](https://wiki.strongswan.org/projects/strongswan/wiki/IKEv2Examples) link) and manually change the configuration files.
 
 For Ansible role you must either change hosts' names in the playbooks or make sure you have configured specified host groups in your inventory (e.g. `/etc/ansible/hosts`):
 
-- `[ipsec]` - a main server where all clients will connect to. There will be stored all PKI information.
-- `[clients]` - a list of linux machines where the role will automatically install and configure the connection. That can be useful if you'd like to secure your server infrastructure. All credentials will be automatically deployed, for this purpose check you configured user-cred mapping properly in `IPSEC_USER_MAPPING` variable.
+- `[ipsec]` - the main server where all clients will connect to. There will be stored all PKI information.
+- `[clients]` - a list of linux machines where the role will automatically install, configure and run IPSec services. However, you have to transfer connection information to these clients by your hand.
 
 ### Functional roles
 
 Variable `CURRENT_ROLES` is to specify, which function a host is assigned to.
 
-The role can assign a host/hostgroup provided by inventory, here are three different roles:
+The role can assign a host/hostgroup provided by an inventory file, here are three different functional roles:
 
-- `ca` - specify a CA host.
+- `ca` - specify a CA host. Key/certificate issue tasks will be accomplished here.
 - `ipsec-server` - specify a host with IPSec server installed. It will serve connections from VPN users.
 - `ipsec-client` - specify a host, an end-point VPN user.
 
-To help in role assignment tasks, there are 5 variables defined (see more in "Configuration Variables" secrion) : `ALL_ROLES`, `CURRENT_ROLES`, `SERVER_ROLES` , `CA_ROLES`, `USER_ROLES`. These varaibles are system only, you should set it explicitly:
+To help in role assignment tasks, there are 5 variables defined (see more in "Configuration Variables" section) : `ALL_ROLES`, `CURRENT_ROLES`, `SERVER_ROLES` , `CA_ROLES`, `USER_ROLES`. These variables are system only, you should set it explicitly:
 
 ```yaml
 CURRENT_ROLES: [ipsec-server, ca]
@@ -49,9 +49,9 @@ CURRENT_ROLES: [ipsec-server, ca]
 The role contains tags:
 
 - `variables` - load and parse variables before any other tasks.
-- `debug` - include debugging tasks to executre during the role.
+- `debug` - include debugging tasks to execute during the role.
 - `packages` - install all necessary packages. Can be used to skip a long process if you have already checked that all dependencies are installed.
-- `prepare` - run tasks to prepare the hosts. The tasks with `prepare` tag are dependent upon the OS type, but basically it install firewall policy, make permissions in security mechanisms (such as SELinux), enable packet forwarding, etc.
+- `prepare` - run tasks to prepare the hosts. The tasks with `prepare` tag are dependent upon the OS type, but basically, it installs firewall policy, makes permissions in security mechanisms (such as SELinux), enables packet forwarding, etc.
 - `ca` - create and configure a Certificate Authority. The CA key and certificate are issued here.
 - `strongswan` - install Strongswan and configure IPSec VPN server.
 - `user` - issue certificates for users and prepare configuration files for them to connect.
@@ -82,16 +82,16 @@ The role contains tags:
 | Variable | Type | Default value| Meaning  |
 | ---      |  --- | ---          |  ---     |
 |  CA_FQDN         |    string   |      sun.strongswan.org        |    FQDN for CA. Can be not used, but the zone name should be along with ipsec FQDN    |
-|  CA_DN         |   string    |     "C=RU, O=Technical Dept Root CA, CN={{CA_FQDN}}"         |   a string to describe the authority  in CA public certificate    |
+|  CA_DN         |   string    |     "C=RU, O=Technical Dept Root CA, CN={{CA_FQDN}}"         |   a string to describe the authority in CA public certificate    |
 |  CA_KEY_NAME         |string|     cakey.pem         |   a convenient name for CA private key file     |
 |  CA_CERT_NAME         |    string   |      cacert.pem        |    convenient name for CA certificate file     |
 |  IPSEC_IP         |    string   |      "{{IPSEC_FQDN}}"        |    the actual external address (IP or FQDN) of the VPN server    |
 |  IPSEC_FQDN         |   string    |      moon.strongswan.org        |  the FQDN name which will be used as Identity      |
-|  IPSEC_DN         |   string    |    "C=RU, O=IPsec Server, CN={{IPSEC_FQDN}}"          |   a string to describe the IPSec server in IPSec public cerificate     |
-|  IPSEC_ENCRYPTION_DOMAIN         |   string    |     10.90.12.12/28         |  a virtual IP pool each VPN  where client will be assigned an address from       |
-|IPSEC_ADVERTISE_DOMAIN|list| 10.90.12.0/28|a set of comma-separated routes which will be advertised for VPN clients|
-|IPSEC_ADVERTISE_DNS|list|8.8.8.8, 8.8.4.4|a set of comma-separated DNS servers server will use in the VPN connection|
-|IPSEC_USERS|list|[admin,]|A list of users which will be allowed to connect. For every user there will be automatically generated keypairs and .conf files|
+|  IPSEC_DN         |   string    |    "C=RU, O=IPsec Server, CN={{IPSEC_FQDN}}"          |   a string to describe the IPSec server in IPSec public certificate     |
+|  IPSEC_ENCRYPTION_DOMAIN         |   string    |     10.90.12.12/28         |  a virtual IP pool each VPN  where a client will be assigned an address from       |
+|IPSEC_ADVERTISE_DOMAIN|string| 10.90.12.0/28|a set of comma-separated routes which will be advertised for VPN clients|
+|IPSEC_ADVERTISE_DNS|string|8.8.8.8, 8.8.4.4|a set of comma-separated DNS servers server will use in the VPN connection|
+|IPSEC_USERS|list|[admin,]|A list of users which will be allowed to connect. For every user, there will be automatically generated keypairs and .conf files|
 |IPSEC_KEY_NAME| string|ipsec_key.pem|a convenient name for IPSec server private key file|
 |IPSEC_CERT_NAME| string | ipsec_cert.pem |  a convenient name for IPSec server certificate file|
 
@@ -110,7 +110,7 @@ Example of inventory file:
 192.168.50.20
 ```
 
-### Prepare an playbook
+### Prepare a playbook
 
 Example of a playbook `main.yml` with default parameters:
 
@@ -119,14 +119,14 @@ Example of a playbook `main.yml` with default parameters:
   roles:
     - role: ipsec-strongswan
       vars:
-        CURRENT_ROLES: [ipsec_server, ca]
+        CURRENT_ROLES: [ipsec-server, ca]
 
 
 - hosts: clients
   roles:
     - role: ipsec-strongswan
       vars:
-        CURRENT_ROLES: [ipsec_client]
+        CURRENT_ROLES: [ipsec-client]
 ```
 
 Example of a playbook `main.yml` with manual parameters:
@@ -136,22 +136,23 @@ Example of a playbook `main.yml` with manual parameters:
   roles:
     - role: ipsec-strongswan
       vars:
-        CURRENT_ROLES: [ipsec_server, ca]
+        CURRENT_ROLES: [ipsec-server, ca]
         CA_FQDN: ca.mysite.com
         IPSEC_FQDN: vpn.mysite.com
-        IPSEC_ADVERTISE_DOMAIN:  
-          - 192.168.12.0/24
-          - 192.168.13.0/24
+        IPSEC_ADVERTISE_DOMAIN:  192.168.12.0/24, 192.168.13.0/24
+        IPSEC_ADVERTISE_DNS: 1.1.1.1
+        IPSEC_USERS:
+          - admin
+          - client1
+          - client2
 
 
 - hosts: clients
   roles:
     - role: ipsec-strongswan
       vars:
-        CURRENT_ROLES: [ipsec_client]
+        CURRENT_ROLES: [ipsec-client]
 ```
-
-
 
 ### Running the playbook
 
@@ -167,7 +168,7 @@ Restrict to execute only users' related tasks:
 ansible-playbook -i inventory.yml main.yml --tags users
 ```
 
-Run the playbook without ckeching for dependencies installed:
+Run the playbook without checking for dependencies installed:
 
 ```bash
 ansible-playbook -i inventory.yml main.yml --skip-tags packages
