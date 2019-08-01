@@ -1,0 +1,12 @@
+destination d_remote {
+        tcp({{REMOTE_SYSLOG_SERVER}} port({{REMOTE_SYSLOG_PORT}}));
+};
+
+
+
+{% if REMOTE_ENABLED %}
+log {
+        source(s_sys);
+        destination(d_remote);
+};
+{% endif %}

@@ -1,0 +1,12 @@
+- name: Check if expected file "{{SOURCE_FILE_PATH}}" exists
+  stat:
+    path: "{{SOURCE_FILE_PATH}}"
+  register: source_file
+- name: Deploy configuration file "{{SOURCE_FILE_NAME}}" for syslog-ng 
+  template:
+    src: file.conf.j2 
+    dest: /etc/syslog-ng/conf.d/{{SOURCE_FILE_NAME}}.conf
+  when: source_file.stat.exists  
+  notify:
+    - reload syslog-ng
+  

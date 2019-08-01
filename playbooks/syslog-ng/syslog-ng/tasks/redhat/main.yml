@@ -1,0 +1,22 @@
+- name: Prepare Host
+  import_tasks: 01-prepare.yml
+
+- name: Install packages
+  import_tasks: 02-packages.yml
+  tags:
+    - packages
+
+- name: Deploy config file for extra system parameters
+  template:
+    src: extras.conf.j2
+    dest: /etc/syslog-ng/conf.d/extras.conf
+
+- name: Deploy logging configuration for specified log files
+  include_tasks: 03-config.yml  
+  vars:
+    SOURCE_FILE_NAME: "{{item.key}}"
+    SOURCE_FILE_PATH: "{{item.value}}"
+  with_dict: "{{SOURCE_FILES}}" 
+
+
+ 

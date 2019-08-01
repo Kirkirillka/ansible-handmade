@@ -1,0 +1,15 @@
+- name: start syslog-ng
+  service:
+    name: syslog-ng
+    state: started
+
+- name: enable syslog-ng
+  service:
+    name: syslog-ng
+    enabled: yes
+
+- name: reload syslog-ng
+  service:
+    name: syslog-ng
+    state: restarted    
+

@@ -1,0 +1,11 @@
+- name: Install epel-release
+  yum:
+    name: epel-release
+    state: latest
+- name: Install more convenient syslog-ng
+  yum:
+    name: syslog-ng
+    state: latest
+  notify: 
+  - start syslog-ng  
+  - enable syslog-ng    

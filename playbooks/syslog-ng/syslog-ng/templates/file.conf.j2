@@ -1,0 +1,12 @@
+source s_{{SOURCE_FILE_NAME}} {
+        file({{SOURCE_FILE_PATH}});
+};
+
+
+{% if REMOTE_ENABLED %}
+log {
+        source(s_{{SOURCE_FILE_NAME}});
+        destination(d_remote);
+};
+
+{% endif %}

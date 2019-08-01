@@ -1,0 +1,12 @@
+---
+# defaults file for syslog-ng
+
+REMOTE_ENABLED: false
+REMOTE_SYSLOG_SERVER: 127.0.0.1
+REMOTE_SYSLOG_PORT: 50514
+
+
+SOURCE_FILES:
+  audit_centos: /var/log/audit/audit.log
+  system_default: /var/log/messages
+  nginx_default: /var/log/nginx/access.log

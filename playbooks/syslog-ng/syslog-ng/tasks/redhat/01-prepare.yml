@@ -1,0 +1,5 @@
+- name: Ensure rsyslog is not installed
+  yum:
+    name: rsyslog
+    state: absent
+    

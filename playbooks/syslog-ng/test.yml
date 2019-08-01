@@ -1,0 +1,10 @@
+- hosts: servers
+  roles:
+  - role: syslog-ng
+    vars:
+      REMOTE_ENABLED: true
+      REMOTE_SYSLOG_SERVER: 10.90.23.3
+      REMOTE_SYSLOG_PORT: 514
+      SOURCE_FILES:
+        audit_centos: /var/log/audit/audit.log
+        nginx_default: /var/log/nginx/access.log
